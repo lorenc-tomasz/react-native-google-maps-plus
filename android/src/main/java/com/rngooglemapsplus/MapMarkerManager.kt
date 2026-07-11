@@ -10,6 +10,7 @@ import com.rngooglemapsplus.extensions.infoWindowContentEquals
 import com.rngooglemapsplus.extensions.infoWindowIsEmpty
 import com.rngooglemapsplus.extensions.markerEquals
 import com.rngooglemapsplus.extensions.styleHash
+import com.rngooglemapsplus.extensions.toMarkerTag
 import kotlinx.coroutines.Job
 
 private class MarkerState(
@@ -161,6 +162,11 @@ class MapMarkerManager(
     val marker = state.marker
     if (marker != null) {
       marker.setIcon(icon)
+      marker.tag =
+        marker.tagData.copy(
+          markerIconWidth = state.current.iconSvg?.width,
+          markerIconHeight = state.current.iconSvg?.height,
+        )
       if (state.anchorsDeferred) {
         builder.applyAnchors(state.current, marker)
         state.anchorsDeferred = false
@@ -175,7 +181,7 @@ class MapMarkerManager(
   private fun addToMap(state: MarkerState) {
     state.marker =
       map?.addMarker(builder.build(state.current, state.appliedIcon))?.apply {
-        tag = MarkerTag(id = state.current.id, iconSvg = state.current.infoWindowIconSvg)
+        tag = state.current.toMarkerTag()
       }
     state.appliedIcon = null
     state.anchorsDeferred = false

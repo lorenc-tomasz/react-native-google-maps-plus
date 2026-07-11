@@ -188,6 +188,11 @@ class MapMarkerBuilder(
         (next.anchor?.x ?: 0.5f).toFloat(),
         (next.anchor?.y ?: 1.0f).toFloat(),
       )
+      marker.tag =
+        marker.tagData.copy(
+          markerAnchorX = next.anchor?.x ?: 0.5,
+          markerAnchorY = next.anchor?.y ?: 1.0,
+        )
     }
 
     if (!deferAnchors && !prev.infoWindowAnchorEquals(next)) {
@@ -226,7 +231,7 @@ class MapMarkerBuilder(
     }
 
     if (!prev.markerInfoWindowStyleEquals(next)) {
-      marker.tag = MarkerTag(id = next.id, iconSvg = next.infoWindowIconSvg)
+      marker.tag = marker.tagData.copy(iconSvg = next.infoWindowIconSvg)
     }
   }
 
@@ -242,6 +247,11 @@ class MapMarkerBuilder(
       (m.infoWindowAnchor?.x ?: 0.5f).toFloat(),
       (m.infoWindowAnchor?.y ?: 0f).toFloat(),
     )
+    marker.tag =
+      marker.tagData.copy(
+        markerAnchorX = m.anchor?.x ?: 0.5,
+        markerAnchorY = m.anchor?.y ?: 1.0,
+      )
   }
 
   fun cachedIcon(styleHash: Int): BitmapDescriptor? = iconCache.get(styleHash)
