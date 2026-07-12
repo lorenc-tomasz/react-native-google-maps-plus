@@ -19,6 +19,7 @@ private class MarkerState(
   var marker: Marker? = null
   var currentToken: Long = 0L
   var appliedIcon: BitmapDescriptor? = null
+  var appliedHitbox: MarkerIconHitbox? = null
   var iconReady: Boolean = false
   var anchorsDeferred: Boolean = false
   var appliedStyleHash: Int? = null
@@ -129,21 +130,21 @@ class MapMarkerManager(
     val iconSvg = state.current.iconSvg
     if (iconSvg == null) {
       state.renderingStyleHash = null
-      applyIcon(id, token, null)
+      applyIcon(id, token, null, null)
       return
     }
 
     val styleHash = state.current.styleHash()
     builder.cachedIcon(styleHash)?.let { cached ->
       state.renderingStyleHash = null
-      applyIcon(id, token, cached)
+      applyIcon(id, token, cached, builder.iconHitbox(iconSvg))
       return
     }
 
     state.renderingStyleHash = styleHash
     state.renderJob =
-      builder.renderIcon(id, iconSvg, styleHash) { icon ->
-        applyIcon(id, token, icon)
+      builder.renderIcon(id, iconSvg, styleHash) { icon, hitbox ->
+        applyIcon(id, token, icon, hitbox)
       }
   }
 
@@ -151,6 +152,7 @@ class MapMarkerManager(
     id: String,
     token: Long,
     icon: BitmapDescriptor?,
+    hitbox: MarkerIconHitbox?,
   ) {
     val state = states[id] ?: return
     if (state.currentToken != token) return
@@ -158,15 +160,12 @@ class MapMarkerManager(
     state.renderingStyleHash = null
     state.appliedStyleHash = if (state.current.iconSvg != null) state.current.styleHash() else null
     state.iconReady = true
+    state.appliedHitbox = hitbox
 
     val marker = state.marker
     if (marker != null) {
       marker.setIcon(icon)
-      marker.tag =
-        marker.tagData.copy(
-          markerIconWidth = state.current.iconSvg?.width,
-          markerIconHeight = state.current.iconSvg?.height,
-        )
+      marker.tag = marker.tagData.copy(markerIconHitbox = hitbox)
       if (state.anchorsDeferred) {
         builder.applyAnchors(state.current, marker)
         state.anchorsDeferred = false
@@ -181,7 +180,7 @@ class MapMarkerManager(
   private fun addToMap(state: MarkerState) {
     state.marker =
       map?.addMarker(builder.build(state.current, state.appliedIcon))?.apply {
-        tag = state.current.toMarkerTag()
+        tag = state.current.toMarkerTag(state.appliedHitbox)
       }
     state.appliedIcon = null
     state.anchorsDeferred = false

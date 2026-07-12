@@ -256,16 +256,30 @@ class MapMarkerBuilder(
 
   fun cachedIcon(styleHash: Int): BitmapDescriptor? = iconCache.get(styleHash)
 
+  fun iconHitbox(iconSvg: RNMarkerSvg): MarkerIconHitbox? {
+    val wPx = iconSvg.width.dpToPx().toInt()
+    val hPx = iconSvg.height.dpToPx().toInt()
+    if (wPx <= 0 || hPx <= 0) return null
+
+    return MarkerIconHitbox(wPx, hPx)
+  }
+
   fun renderIcon(
     markerId: String,
     iconSvg: RNMarkerSvg,
     styleHash: Int,
-    onReady: (BitmapDescriptor) -> Unit,
+    onReady: (BitmapDescriptor, MarkerIconHitbox?) -> Unit,
   ): Job =
     scope.launch {
       try {
         ensureActive()
         val renderResult = renderBitmap(iconSvg, markerId)
+        val hitbox =
+          if (renderResult.isFallback) {
+            null
+          } else {
+            MarkerIconHitbox(renderResult.bitmap.width, renderResult.bitmap.height)
+          }
 
         val desc =
           try {
@@ -280,14 +294,14 @@ class MapMarkerBuilder(
         }
         withContext(Dispatchers.Main) {
           ensureActive()
-          onReady(desc)
+          onReady(desc, hitbox)
         }
       } catch (e: OutOfMemoryError) {
         mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=$markerId renderIcon out of memory", e)
         clearIconCache()
         withContext(Dispatchers.Main) {
           ensureActive()
-          onReady(createFallbackDescriptor())
+          onReady(createFallbackDescriptor(), null)
         }
       } catch (_: CancellationException) {
         // cancelled
@@ -295,7 +309,7 @@ class MapMarkerBuilder(
         mapErrorHandler.report(RNMapErrorCode.MARKER_ICON_BUILD_FAILED, "markerId=$markerId renderIcon failed", t)
         withContext(Dispatchers.Main) {
           ensureActive()
-          onReady(createFallbackDescriptor())
+          onReady(createFallbackDescriptor(), null)
         }
       }
     }
