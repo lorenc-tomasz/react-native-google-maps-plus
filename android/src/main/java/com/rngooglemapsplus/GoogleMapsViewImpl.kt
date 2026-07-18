@@ -39,6 +39,8 @@ import com.rngooglemapsplus.extensions.toRNIndoorLevel
 import com.rngooglemapsplus.extensions.toRNLatLng
 import com.rngooglemapsplus.extensions.toRNLocation
 import com.rngooglemapsplus.extensions.toRNRegion
+import java.io.ByteArrayInputStream
+import java.nio.charset.StandardCharsets
 import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
@@ -251,6 +253,8 @@ class GoogleMapsViewImpl(
         }
       }
     }
+
+  var enableStrictMarkerPressHitbox = false
 
   @SuppressLint("MissingPermission")
   var myLocationEnabled: Boolean? = null
@@ -607,7 +611,8 @@ class GoogleMapsViewImpl(
   }
 
   override fun onMarkerClick(marker: Marker): Boolean {
-    val shouldTreatAsMapPress = !isTouchInsideMarkerBitmap(marker)
+    val shouldTreatAsMapPress =
+      enableStrictMarkerPressHitbox && !isTouchInsideMarkerBitmap(marker)
 
     onUi {
       if (shouldTreatAsMapPress) {

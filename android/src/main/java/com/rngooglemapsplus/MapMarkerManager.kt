@@ -78,7 +78,11 @@ class MapMarkerManager(
 
       state.marker?.let { marker ->
         builder.update(prev, next, marker, deferAnchors)
-        if (marker.isInfoWindowShown && !prev.infoWindowContentEquals(next)) {
+        val infoWindowNeedsRefresh =
+          !prev.infoWindowContentEquals(next) ||
+            !prev.infoWindowAnchorEquals(next) ||
+            prev.rotation != next.rotation
+        if (marker.isInfoWindowShown && infoWindowNeedsRefresh) {
           if (next.infoWindowIsEmpty()) {
             hideInfoWindow(next.id)
           } else {
@@ -137,7 +141,7 @@ class MapMarkerManager(
     val styleHash = state.current.styleHash()
     builder.cachedIcon(styleHash)?.let { cached ->
       state.renderingStyleHash = null
-      applyIcon(id, token, cached, builder.iconHitbox(iconSvg))
+      applyIcon(id, token, cached, builder.buildHitbox(iconSvg))
       return
     }
 
@@ -160,20 +164,20 @@ class MapMarkerManager(
     state.renderingStyleHash = null
     state.appliedStyleHash = if (state.current.iconSvg != null) state.current.styleHash() else null
     state.iconReady = true
-    state.appliedHitbox = hitbox
 
     val marker = state.marker
     if (marker != null) {
       marker.setIcon(icon)
-      marker.tag = marker.tagData.copy(markerIconHitbox = hitbox)
       if (state.anchorsDeferred) {
         builder.applyAnchors(state.current, marker)
         state.anchorsDeferred = false
       }
+      marker.tag = state.current.toMarkerTag(hitbox)
       return
     }
 
     state.appliedIcon = icon
+    state.appliedHitbox = hitbox
     if (map != null) addToMap(state)
   }
 
@@ -183,6 +187,7 @@ class MapMarkerManager(
         tag = state.current.toMarkerTag(state.appliedHitbox)
       }
     state.appliedIcon = null
+    state.appliedHitbox = null
     state.anchorsDeferred = false
   }
 

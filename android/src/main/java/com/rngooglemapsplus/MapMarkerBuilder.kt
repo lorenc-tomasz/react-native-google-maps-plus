@@ -24,6 +24,7 @@ import com.rngooglemapsplus.extensions.coordinatesEquals
 import com.rngooglemapsplus.extensions.infoWindowAnchorEquals
 import com.rngooglemapsplus.extensions.markerInfoWindowStyleEquals
 import com.rngooglemapsplus.extensions.toLatLng
+import com.rngooglemapsplus.extensions.toMarkerTag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -188,11 +189,6 @@ class MapMarkerBuilder(
         (next.anchor?.x ?: 0.5f).toFloat(),
         (next.anchor?.y ?: 1.0f).toFloat(),
       )
-      marker.tag =
-        marker.tagData.copy(
-          markerAnchorX = next.anchor?.x ?: 0.5,
-          markerAnchorY = next.anchor?.y ?: 1.0,
-        )
     }
 
     if (!deferAnchors && !prev.infoWindowAnchorEquals(next)) {
@@ -230,9 +226,12 @@ class MapMarkerBuilder(
       marker.zIndex = next.zIndex?.toFloat() ?: 0f
     }
 
-    if (!prev.markerInfoWindowStyleEquals(next)) {
-      marker.tag = marker.tagData.copy(iconSvg = next.infoWindowIconSvg)
-    }
+    marker.tag =
+      if (deferAnchors) {
+        marker.tagData.copy(iconSvg = next.infoWindowIconSvg)
+      } else {
+        next.toMarkerTag(marker.tagData.markerIconHitbox)
+      }
   }
 
   fun applyAnchors(
@@ -247,22 +246,15 @@ class MapMarkerBuilder(
       (m.infoWindowAnchor?.x ?: 0.5f).toFloat(),
       (m.infoWindowAnchor?.y ?: 0f).toFloat(),
     )
-    marker.tag =
-      marker.tagData.copy(
-        markerAnchorX = m.anchor?.x ?: 0.5,
-        markerAnchorY = m.anchor?.y ?: 1.0,
-      )
   }
 
   fun cachedIcon(styleHash: Int): BitmapDescriptor? = iconCache.get(styleHash)
 
-  fun iconHitbox(iconSvg: RNMarkerSvg): MarkerIconHitbox? {
-    val wPx = iconSvg.width.dpToPx().toInt()
-    val hPx = iconSvg.height.dpToPx().toInt()
-    if (wPx <= 0 || hPx <= 0) return null
-
-    return MarkerIconHitbox(wPx, hPx)
-  }
+  fun buildHitbox(iconSvg: RNMarkerSvg): MarkerIconHitbox =
+    MarkerIconHitbox(
+      widthPx = iconSvg.width.dpToPx().toInt(),
+      heightPx = iconSvg.height.dpToPx().toInt(),
+    )
 
   fun renderIcon(
     markerId: String,
@@ -274,6 +266,7 @@ class MapMarkerBuilder(
       try {
         ensureActive()
         val renderResult = renderBitmap(iconSvg, markerId)
+
         val hitbox =
           if (renderResult.isFallback) {
             null
