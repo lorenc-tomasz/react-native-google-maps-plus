@@ -1,3 +1,38 @@
+## [1.15.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.14.0...v1.15.0) (2026-08-24)
+
+### ✨ Features
+
+* **android:** report onMapReady(false) when maps sdk init fails ([f5640ad](https://github.com/pinpong/react-native-google-maps-plus/commit/f5640ad902ffc7b2be5bda5a1c04e18916a92562))
+* expose clearMarkerIconCache ([e2d4053](https://github.com/pinpong/react-native-google-maps-plus/commit/e2d4053f167faf3b78a7ddb7a8e03d99319907e1))
+
+### 🐛 Bug Fixes
+
+* **android:** always attempt maps sdk initialization ([821cc5f](https://github.com/pinpong/react-native-google-maps-plus/commit/821cc5f634c7637b544d1081ba70f59fca61d4d1))
+* **android:** guard Google Maps SDK initialization ([8caab1a](https://github.com/pinpong/react-native-google-maps-plus/commit/8caab1a9064d778b10d1e6bcf52d7d7711eaf14d))
+* **android:** preserve Maps SDK resolution UI ([607f3c6](https://github.com/pinpong/react-native-google-maps-plus/commit/607f3c6c7bf78cc2d32a1b0e9a24929283aeb47a))
+* **android:** recycle marker bitmap on cancelled render ([465690f](https://github.com/pinpong/react-native-google-maps-plus/commit/465690f81766b944e3bbce29de0d44efe6b8791d))
+* **android:** snapshot target size ([ccae0f3](https://github.com/pinpong/react-native-google-maps-plus/commit/ccae0f3996336995a8678ce341c33038be0bf399))
+* **android:** use LocationCompat for mock locations ([430d3e6](https://github.com/pinpong/react-native-google-maps-plus/commit/430d3e666f17297c5eb12a2eeb8c644ed87457c9))
+* **example:** hide map loader on errors ([81dfa6f](https://github.com/pinpong/react-native-google-maps-plus/commit/81dfa6fdbef87ff18418f41d126e6e19008d0317))
+* **expo:** monorepo-safe podfile injection ([a24f602](https://github.com/pinpong/react-native-google-maps-plus/commit/a24f602999c74747c5c016eae10ee61e0dd7c67f))
+* **ios:** rework info window refresh ([3d658a6](https://github.com/pinpong/react-native-google-maps-plus/commit/3d658a6d0667c6eee4ec928f124c31327e95ea12))
+* rework async marker icon lifecycle ([ae2f6a1](https://github.com/pinpong/react-native-google-maps-plus/commit/ae2f6a1440dd8e6b528e6dd8fbb3e49b4433eabe))
+* rework info window refresh lifecycle ([230c001](https://github.com/pinpong/react-native-google-maps-plus/commit/230c0011d3750e78537848954f85d80d06dc9d2e))
+* rework marker info window and icon render lifecycle ([44b290c](https://github.com/pinpong/react-native-google-maps-plus/commit/44b290c2a59be8dcd4ccce4bc9a6d6b0f3326bfa))
+
+### 🔄 Code Refactors
+
+* **android:** rework maps sdk initialization ([be0c33b](https://github.com/pinpong/react-native-google-maps-plus/commit/be0c33b9945e3ee8b3898c03e20bdbfab00efa9a))
+
+### 📚 Documentation
+
+* clarify isGooglePlayServicesAvailable semantics ([1120012](https://github.com/pinpong/react-native-google-maps-plus/commit/1120012eef5ca7ec5b8b4d127f9c4dee649e89e6))
+* document Android dark mode requirements ([e85fd2c](https://github.com/pinpong/react-native-google-maps-plus/commit/e85fd2cf261670bdd4ec35d9cdbd64f90376a8c8))
+
+### 🛠️ Other changes
+
+* update dependencies ([2e0b9f1](https://github.com/pinpong/react-native-google-maps-plus/commit/2e0b9f127d22ef77f42bff9bef0d36f50bd4a30e))
+
 ## [1.14.0](https://github.com/pinpong/react-native-google-maps-plus/compare/v1.13.1...v1.14.0) (2026-07-05)
 
 ### ✨ Features
