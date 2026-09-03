@@ -349,6 +349,7 @@ class GoogleMapsViewImpl(
         value?.android?.priority?.toGooglePriority(),
         value?.android?.interval?.toLong(),
         value?.android?.minUpdateInterval?.toLong(),
+        value?.android?.minUpdateDistanceMeters?.toFloat(),
       )
     }
 
